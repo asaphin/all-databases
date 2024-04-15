@@ -1,2 +1,2 @@
-# all-databases
+# All Databases
 Go code samples for using databases
