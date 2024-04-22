@@ -1,6 +1,7 @@
 package config
 
 import (
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"os"
 	"sync"
@@ -13,19 +14,23 @@ var configInstanceSync sync.Once
 
 func Get() *Config {
 	configInstanceSync.Do(func() {
+		log.Debug("loading config")
+
 		data, err := os.ReadFile(configFilePath)
 		if err != nil {
-			panic(err)
+			log.WithError(err).Fatal("unable to read config")
 		}
 
 		var config Config
 
 		err = yaml.Unmarshal(data, &config)
 		if err != nil {
-			panic(err)
+			log.WithError(err).Fatal("unable to parse config")
 		}
 
 		configInstance = &config
+
+		log.Info("loaded config")
 	})
 
 	return configInstance

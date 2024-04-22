@@ -1,24 +1,25 @@
 package postgres
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/asaphin/all-databases-go/internal/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"os"
-	"os/signal"
+	log "github.com/sirupsen/logrus"
 	"sync"
-	"syscall"
 )
 
-var dbInstances = make(map[string]*sqlx.DB)
+var dbInstances = make(map[string]*sql.DB)
 var shutdownSync = sync.Once{}
 
-func NewDB(dbName string) *sqlx.DB {
+func New(dbName string) (*sql.DB, error) {
 	if _, ok := dbInstances[dbName]; !ok {
 		cfg := config.Get()
 
-		db, err := sqlx.Connect("postgres", fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		log.WithField("dbName", dbName).Debug("connecting to database")
+
+		db, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 			cfg.Postgres.Host,
 			cfg.Postgres.Port,
 			cfg.Postgres.Username,
@@ -26,38 +27,46 @@ func NewDB(dbName string) *sqlx.DB {
 			dbName,
 			cfg.Postgres.SSLMode))
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		err = db.Ping()
 		if err != nil {
-			panic(err)
+			closeErr := db.Close()
+			if closeErr != nil {
+				log.WithField("dbName", dbName).WithError(closeErr).Warn("failed to close database connection")
+			}
+
+			return nil, err
 		}
 
 		dbInstances[dbName] = db
-
-		shutdownSync.Do(func() {
-			go handleShutdown()
-		})
 	}
 
-	return dbInstances[dbName]
+	return dbInstances[dbName], nil
 }
 
-func handleShutdown() {
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+func Shutdown() {
+	log.Trace("shutting down postgres database instances")
 
-	sig := <-sigCh
-	fmt.Printf("got system signal %s, shutting down...\n", sig.String())
+	shutdownSync.Do(func() {
+		for name, db := range dbInstances {
+			log.WithField("dbName", name).Trace("shutting down postgres database instance")
 
-	for name, db := range dbInstances {
-		if err := db.Close(); err == nil {
-			fmt.Printf("postgres %s connection closed\n", name)
-		} else {
-			fmt.Printf("unable to close connection to postgres %s: %s\n", name, err.Error())
+			if err := db.Close(); err == nil {
+				log.WithField("name", name).Debug("connection closed")
+			} else {
+				log.WithField("name", name).WithError(err).Warn("unable to close connection")
+			}
 		}
+	})
+}
+
+func NewSqlx(dbName string) (*sqlx.DB, error) {
+	innerDB, err := New(dbName)
+	if err != nil {
+		return nil, err
 	}
 
-	os.Exit(0)
+	return sqlx.NewDb(innerDB, "postgres"), nil
 }
