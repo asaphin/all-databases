@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/asaphin/all-databases-go/internal/infrstructure/postgres"
+	"github.com/asaphin/all-databases-go/internal/infrastructure/postgres"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
@@ -16,6 +16,12 @@ func init() {
 		TimestampFormat: time.RFC3339Nano,
 	})
 	log.SetReportCaller(true)
+
+	err := postgres.MigrateSQLX()
+	if err != nil {
+		log.WithError(err).Fatal("failed to migrate for postgres sqlx database")
+	}
+	log.Info("successfully migrated for postgres sqlx database")
 
 	log.Trace("initialization done")
 }
