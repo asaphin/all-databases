@@ -13,7 +13,7 @@ const (
 
 type Address struct {
 	ID           string
-	Type         string
+	Type         AddressType
 	InCareOfName string
 	Street       string
 	StreetNumber string

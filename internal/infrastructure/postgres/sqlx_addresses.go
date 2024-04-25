@@ -22,9 +22,33 @@ func NewPostgresSQLXAddressRepository() (*PostgresSQLXAddressRepository, error) 
 }
 
 func (repo *PostgresSQLXAddressRepository) Create(ctx context.Context, address domain.Address) (string, error) {
-	query := `INSERT INTO addresses (id, street, city, state, zip) VALUES ($1, $2, $3, $4, $5) RETURNING id`
+	query := `
+        INSERT INTO addresses 
+            (id, type, in_care_of_name, street, street_number, apartment, suite, floor, city, state, province, zip, postal_code, country, latitude, longitude) 
+        VALUES 
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) 
+        RETURNING id`
+
 	var id string
-	err := repo.db.QueryRowContext(ctx, query, address.ID, address.Street, address.City, address.State, address.Zip).Scan(&id)
+	err := repo.db.QueryRowxContext(ctx, query,
+		address.ID,
+		address.Type,
+		address.InCareOfName,
+		address.Street,
+		address.StreetNumber,
+		address.Apartment,
+		address.Suite,
+		address.Floor,
+		address.City,
+		address.State,
+		address.Province,
+		address.Zip,
+		address.PostalCode,
+		address.Country,
+		address.Latitude,
+		address.Longitude,
+	).Scan(&id)
+
 	if err != nil {
 		return "", err
 	}
