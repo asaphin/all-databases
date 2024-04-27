@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"github.com/asaphin/all-databases-go/internal/datagenerator"
 	"github.com/asaphin/all-databases-go/internal/infrastructure/postgres"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -29,7 +31,7 @@ func init() {
 func main() {
 	log.Trace("main() called")
 
-	_, err := postgres.NewSqlx("postgres")
+	addressesRepo, err := postgres.NewSQLXAddressRepository()
 	if err != nil {
 		log.WithError(err).Fatal("error connecting to database")
 	}
@@ -48,6 +50,13 @@ func main() {
 			log.WithError(shutdownErr).Fatal("unable to shutdown correrctly")
 		}
 	}()
+
+	id, err := addressesRepo.Create(context.Background(), datagenerator.New().VR().UnitedStatesAddress())
+	if err != nil {
+		log.WithError(err).Fatal("unable to create address")
+	} else if err == nil {
+		log.WithField("id", id).Info("address created")
+	}
 }
 
 func handleShutdown(shutdown func() error) {

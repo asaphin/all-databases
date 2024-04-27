@@ -6,32 +6,31 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type PostgresSQLXAddressRepository struct {
+type SQLXAddressRepository struct {
 	db *sqlx.DB
 }
 
-func NewPostgresSQLXAddressRepository() (*PostgresSQLXAddressRepository, error) {
+func NewSQLXAddressRepository() (*SQLXAddressRepository, error) {
 	db, err := NewSqlx(sqlxDatabaseName)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PostgresSQLXAddressRepository{
+	return &SQLXAddressRepository{
 		db: db,
 	}, nil
 }
 
-func (repo *PostgresSQLXAddressRepository) Create(ctx context.Context, address domain.Address) (string, error) {
+func (repo *SQLXAddressRepository) Create(ctx context.Context, address domain.Address) (string, error) {
 	query := `
         INSERT INTO addresses 
-            (id, type, in_care_of_name, street, street_number, apartment, suite, floor, city, state, province, zip, postal_code, country, latitude, longitude) 
+            (type, in_care_of_name, street, street_number, apartment, suite, floor, city, state, province, zip, postal_code, country, latitude, longitude) 
         VALUES 
-            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) 
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) 
         RETURNING id`
 
 	var id string
 	err := repo.db.QueryRowxContext(ctx, query,
-		address.ID,
 		address.Type,
 		address.InCareOfName,
 		address.Street,
@@ -55,7 +54,7 @@ func (repo *PostgresSQLXAddressRepository) Create(ctx context.Context, address d
 	return id, nil
 }
 
-func (repo *PostgresSQLXAddressRepository) List(ctx context.Context, limit, offset int) ([]*domain.Address, error) {
+func (repo *SQLXAddressRepository) List(ctx context.Context, limit, offset int) ([]*domain.Address, error) {
 	query := `SELECT * FROM addresses LIMIT $1 OFFSET $2`
 	var addresses []*domain.Address
 	err := repo.db.SelectContext(ctx, &addresses, query, limit, offset)
@@ -65,7 +64,7 @@ func (repo *PostgresSQLXAddressRepository) List(ctx context.Context, limit, offs
 	return addresses, nil
 }
 
-func (repo *PostgresSQLXAddressRepository) GetByID(ctx context.Context, addressID string) (*domain.Address, error) {
+func (repo *SQLXAddressRepository) GetByID(ctx context.Context, addressID string) (*domain.Address, error) {
 	query := `SELECT * FROM addresses WHERE id = $1`
 	var address domain.Address
 	err := repo.db.GetContext(ctx, &address, query, addressID)
@@ -75,7 +74,7 @@ func (repo *PostgresSQLXAddressRepository) GetByID(ctx context.Context, addressI
 	return &address, nil
 }
 
-func (repo *PostgresSQLXAddressRepository) Update(ctx context.Context, address domain.Address) error {
+func (repo *SQLXAddressRepository) Update(ctx context.Context, address domain.Address) error {
 	query := `UPDATE addresses SET street=$1, city=$2, state=$3, zip=$4 WHERE id=$5`
 	_, err := repo.db.ExecContext(ctx, query, address.Street, address.City, address.State, address.Zip, address.ID)
 	if err != nil {
@@ -84,7 +83,7 @@ func (repo *PostgresSQLXAddressRepository) Update(ctx context.Context, address d
 	return nil
 }
 
-func (repo *PostgresSQLXAddressRepository) Delete(ctx context.Context, addressID string) error {
+func (repo *SQLXAddressRepository) Delete(ctx context.Context, addressID string) error {
 	query := `DELETE FROM addresses WHERE id=$1`
 	_, err := repo.db.ExecContext(ctx, query, addressID)
 	if err != nil {
