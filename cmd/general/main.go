@@ -1,8 +1,7 @@
 package main
 
 import (
-	"context"
-	"github.com/asaphin/all-databases-go/internal/datagenerator"
+	"github.com/asaphin/all-databases-go/internal/app"
 	"github.com/asaphin/all-databases-go/internal/infrastructure/postgres"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -19,22 +18,11 @@ func init() {
 	})
 	log.SetReportCaller(true)
 
-	err := postgres.MigrateSQLX()
-	if err != nil {
-		log.WithError(err).Fatal("failed to migrate for postgres sqlx database")
-	}
-	log.Info("successfully migrated for postgres sqlx database")
-
 	log.Trace("initialization done")
 }
 
 func main() {
 	log.Trace("main() called")
-
-	addressesRepo, err := postgres.NewSQLXAddressRepository()
-	if err != nil {
-		log.WithError(err).Fatal("error connecting to database")
-	}
 
 	shutdown := func() error {
 		postgres.Shutdown()
@@ -51,12 +39,14 @@ func main() {
 		}
 	}()
 
-	id, err := addressesRepo.Create(context.Background(), datagenerator.New().VR().UnitedStatesAddress())
+	addressesRepository, err := postgres.NewSQLXAddressRepository()
 	if err != nil {
-		log.WithError(err).Fatal("unable to create address")
-	} else if err == nil {
-		log.WithField("id", id).Info("address created")
+		log.WithError(err).Fatal("unable to create addresses repository")
 	}
+
+	addressesScenario := app.NewAddressesScenarioService(addressesRepository)
+
+	addressesScenario.Run()
 }
 
 func handleShutdown(shutdown func() error) {

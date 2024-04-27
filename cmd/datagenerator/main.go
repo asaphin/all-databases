@@ -6,5 +6,7 @@ import (
 )
 
 func main() {
-	fmt.Println(datagenerator.New().VR().UnitedStatesAddress())
+	for i := 0; i < 10; i++ {
+		fmt.Println(datagenerator.New().VR().Address().String())
+	}
 }

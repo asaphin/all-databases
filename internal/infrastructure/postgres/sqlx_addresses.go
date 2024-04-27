@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"github.com/asaphin/all-databases-go/internal/domain"
 	"github.com/jmoiron/sqlx"
 )
@@ -21,29 +23,31 @@ func NewSQLXAddressRepository() (*SQLXAddressRepository, error) {
 	}, nil
 }
 
-func (repo *SQLXAddressRepository) Create(ctx context.Context, address domain.Address) (string, error) {
+func (repo *SQLXAddressRepository) Create(ctx context.Context, address *domain.Address) (string, error) {
 	query := `
         INSERT INTO addresses 
-            (type, in_care_of_name, street, street_number, apartment, suite, floor, city, state, province, zip, postal_code, country, latitude, longitude) 
+            (type, in_care_of_name, street, street_number, apartment, locality, region, postal_code, country, additional_info, latitude, longitude) 
         VALUES 
-            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) 
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
         RETURNING id`
 
+	additionalInfoJSON, err := json.Marshal(address.AdditionalInfo)
+	if err != nil {
+		return "", err
+	}
+
 	var id string
-	err := repo.db.QueryRowxContext(ctx, query,
+	err = repo.db.QueryRowContext(ctx, query,
 		address.Type,
 		address.InCareOfName,
 		address.Street,
 		address.StreetNumber,
 		address.Apartment,
-		address.Suite,
-		address.Floor,
-		address.City,
-		address.State,
-		address.Province,
-		address.Zip,
+		address.Locality,
+		address.Region,
 		address.PostalCode,
 		address.Country,
+		additionalInfoJSON,
 		address.Latitude,
 		address.Longitude,
 	).Scan(&id)
@@ -51,6 +55,7 @@ func (repo *SQLXAddressRepository) Create(ctx context.Context, address domain.Ad
 	if err != nil {
 		return "", err
 	}
+
 	return id, nil
 }
 
@@ -74,13 +79,14 @@ func (repo *SQLXAddressRepository) GetByID(ctx context.Context, addressID string
 	return &address, nil
 }
 
-func (repo *SQLXAddressRepository) Update(ctx context.Context, address domain.Address) error {
-	query := `UPDATE addresses SET street=$1, city=$2, state=$3, zip=$4 WHERE id=$5`
-	_, err := repo.db.ExecContext(ctx, query, address.Street, address.City, address.State, address.Zip, address.ID)
-	if err != nil {
-		return err
-	}
-	return nil
+func (repo *SQLXAddressRepository) Update(ctx context.Context, address *domain.Address) error {
+	//query := `UPDATE addresses SET street=$1, city=$2, state=$3, zip=$4 WHERE id=$5`
+	//_, err := repo.db.ExecContext(ctx, query, address.Street, address.City, address.State, address.Zip, address.ID)
+	//if err != nil {
+	//	return err
+	//}
+	//return nil
+	return errors.New("unimplemented")
 }
 
 func (repo *SQLXAddressRepository) Delete(ctx context.Context, addressID string) error {
