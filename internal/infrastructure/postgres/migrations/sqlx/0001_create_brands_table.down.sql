@@ -1,0 +1,2 @@
+DROP INDEX IF EXISTS idx_brand_name;
+DROP TABLE IF EXISTS brands;

@@ -44,7 +44,7 @@ func (vr *VehicleRentalDataGenerator) Address() domain.Address {
 		inCareOfName = optional(vr.dg.Person().Name(), 0.3)
 	}
 
-	country := vr.dg.Address().Country()
+	country := randomChioce("United States", vr.dg.Address().Country(), 0.4)
 	var region string
 	if country == "United States" {
 		region = vr.dg.Address().State()
@@ -85,6 +85,14 @@ func (vr *VehicleRentalDataGenerator) Address() domain.Address {
 
 func randomElement[T any](s []T) T {
 	return s[rand.Intn(len(s))]
+}
+
+func randomChioce[T any](e1, e2 T, firstElementProbability float64) T {
+	if rand.Float64() < firstElementProbability {
+		return e1
+	}
+
+	return e2
 }
 
 func optional[T any](v T, appearProbability float64) T {

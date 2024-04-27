@@ -1,0 +1,30 @@
+CREATE TABLE brands
+(
+    id     SERIAL PRIMARY KEY,
+    name   VARCHAR(100) UNIQUE NOT NULL,
+    slogan TEXT
+);
+
+CREATE INDEX idx_brand_name ON brands (name);
+
+INSERT INTO brands (name, slogan)
+VALUES ('Speedy Wheels', 'Drive with confidence'),
+       ('UrbanRide', 'Explore the city in style'),
+       ('Coastal Getaways', 'Escape to the coast'),
+       ('Mountain Motors', 'Conquer the peaks'),
+       ('EcoMotion', 'Driving towards sustainability'),
+       ('Luxury Drives', 'Experience luxury on the road'),
+       ('Family Wheels', 'Journeys made memorable'),
+       ('Exotic Rentals', 'Unleash your sense of adventure'),
+       ('Business Travelers', 'Efficiency meets comfort'),
+       ('Nitro Wheels', 'Unleash your next adventure'),
+       ('Sunshine Scooters', 'Cruise into endless possibilities'),
+       ('Mountain Mobility', 'Conquer any peak, any season'),
+       ('City Slickers', 'Navigate the urban jungle with ease'),
+       ('Timeless Classics', 'Rent a piece of automotive history'),
+       ('Eco Ride', 'Drive green, explore guilt-free'),
+       ('Open Road Rentals', 'Hit the open road, wherever it leads'),
+       ('Beach Buggy Bonanza', 'Catch the coastal breeze with style'),
+       ('Cargo Carriers', 'Haul your dreams, big or small'),
+       ('Campus Cruisers', 'Gear up for college adventures'),
+       ('SkyLynx Skycrafts', 'Take flight with tomorrow''s transportation');
