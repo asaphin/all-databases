@@ -30,6 +30,8 @@ func New(dbName string) (*sql.DB, error) {
 			return nil, err
 		}
 
+		log.WithField("dbName", dbName).Debug("database connected")
+
 		err = db.Ping()
 		if err != nil {
 			closeErr := db.Close()
@@ -39,6 +41,8 @@ func New(dbName string) (*sql.DB, error) {
 
 			return nil, err
 		}
+
+		log.WithField("dbName", dbName).Debug("ping successfull")
 
 		dbInstances[dbName] = db
 	}
@@ -67,6 +71,8 @@ func NewSqlx(dbName string) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	log.WithField("dbName", dbName).Debug("sqlx instance created")
 
 	return sqlx.NewDb(innerDB, "postgres"), nil
 }

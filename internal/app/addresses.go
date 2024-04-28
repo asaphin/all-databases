@@ -24,6 +24,8 @@ func (s *AddressesScenarioService) Run() {
 	if err != nil {
 		log.WithError(err).Error("unable to create sample addresses")
 	}
+
+	s.cleanupAddresses()
 }
 
 func (s *AddressesScenarioService) createSampleAddresses() error {
