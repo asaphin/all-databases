@@ -66,13 +66,19 @@ func Shutdown() {
 	})
 }
 
+var sqlxInstances = make(map[string]*sqlx.DB)
+
 func NewSqlx(dbName string) (*sqlx.DB, error) {
-	innerDB, err := New(dbName)
-	if err != nil {
-		return nil, err
+	if _, ok := sqlxInstances[dbName]; !ok {
+		innerDB, err := New(dbName)
+		if err != nil {
+			return nil, err
+		}
+
+		log.WithField("dbName", dbName).Debug("sqlx instance created")
+
+		sqlxInstances[dbName] = sqlx.NewDb(innerDB, "postgres")
 	}
 
-	log.WithField("dbName", dbName).Debug("sqlx instance created")
-
-	return sqlx.NewDb(innerDB, "postgres"), nil
+	return sqlxInstances[dbName], nil
 }

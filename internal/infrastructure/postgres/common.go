@@ -1,3 +1,6 @@
 package postgres
 
-const sqlxDatabaseName = "sqlx"
+const (
+	sqlxDatabaseName      = "sqlx"
+	sqlxFilesDatabaseName = "sqlx_files"
+)

@@ -24,5 +24,4 @@ func main() {
 	svc := internal.NewAllDatabasesService()
 
 	runner.Run(svc)
-
 }

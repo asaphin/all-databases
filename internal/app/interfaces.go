@@ -5,6 +5,13 @@ import (
 	"github.com/asaphin/all-databases-go/internal/domain"
 )
 
+type FilesRepository interface {
+	Put(ctx context.Context, file *domain.File) error
+	List(ctx context.Context) ([]*domain.FileListItem, error)
+	Get(ctx context.Context, id string) (*domain.File, error)
+	Delete(ctx context.Context, id string) error
+}
+
 type AddressesRepository interface {
 	Create(ctx context.Context, address *domain.Address) (string, error)
 	List(ctx context.Context, limit, offset int) ([]*domain.Address, error)

@@ -11,5 +11,10 @@ func main() {
 		log.WithError(err).Error("unable to make migrations for postgres sqlx database")
 	}
 
+	err = postgres.MigrateSQLXFiles()
+	if err != nil {
+		log.WithError(err).Error("unable to make migrations for postgres sqlx_files database")
+	}
+
 	postgres.Shutdown()
 }

@@ -39,3 +39,34 @@ func MigrateSQLX() error {
 
 	return nil
 }
+
+func MigrateSQLXFiles() error {
+	db, err := New("sqlx_files")
+	if err != nil {
+		return err
+	}
+
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		return err
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://./internal/infrastructure/postgres/migrations/sqlx_files",
+		"sqlx", driver)
+	if err != nil {
+		if errors.Is(err, migrate.ErrNoChange) {
+			log.Info("no new migrations found")
+
+			return nil
+		}
+
+		return err
+	}
+
+	if err = m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) { // or m.Step(2) if you want to explicitly set the number of migrations to run
+		return err
+	}
+
+	return nil
+}
