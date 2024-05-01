@@ -4,14 +4,12 @@ import (
 	"github.com/asaphin/all-databases-go/internal"
 	"github.com/asaphin/runner"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 func init() {
-	log.SetLevel(log.TraceLevel)
-	log.SetFormatter(&log.TextFormatter{
-		FullTimestamp:   true,
-		TimestampFormat: time.RFC3339Nano,
+	log.SetLevel(log.InfoLevel)
+	log.SetFormatter(&log.JSONFormatter{
+		PrettyPrint: true,
 	})
 	log.SetReportCaller(true)
 

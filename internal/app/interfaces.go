@@ -19,3 +19,11 @@ type AddressesRepository interface {
 	Update(ctx context.Context, address *domain.Address) error
 	Delete(ctx context.Context, addressID string) error
 }
+
+type BrandsRepository interface {
+	Create(ctx context.Context, brand *domain.Brand) (string, error)
+	List(ctx context.Context, limit, offset int) ([]*domain.BrandListItem, error)
+	GetByID(ctx context.Context, brandID string) (*domain.Brand, error)
+	Update(ctx context.Context, brand *domain.Brand) error
+	Delete(ctx context.Context, brandID string) error
+}

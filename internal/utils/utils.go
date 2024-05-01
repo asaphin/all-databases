@@ -13,3 +13,19 @@ func LogAsErrorIfError(err error, args ...interface{}) {
 		log.WithError(err).Error(args...)
 	}
 }
+
+func LogAsWarningIfReturnsError(f func() error, args ...interface{}) {
+	err := f()
+
+	if err == nil {
+		log.WithError(err).Warning(args...)
+	}
+}
+
+func LogAsErrorIfReturnsError(f func() error, args ...interface{}) {
+	err := f()
+
+	if err == nil {
+		log.WithError(err).Error(args...)
+	}
+}
