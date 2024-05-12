@@ -1,0 +1,15 @@
+manufacturer,model,serial_number,year,type,status,metadata
+Ford,Mustang,1HGC-R2A3-EKJ6-5432-1,1967,car,available,color=red;horsepower=325
+Chevrolet,Camaro,2HSH-CR7A-3EKJ-6543-21,1969,car,rented,color=yellow;engine=V8
+Volkswagen,Beetle,3JY-DTR7A-3EKJ-6543-21,1973,car,available,color=blue|nicknamed:Herbie
+Toyota,Corolla,4KS-JTR7A-3EKJ-6543-21,1985,car,available,color:silver~known_for:reliability
+Honda,Civic,5LA-SDT7A-3EKJ-6543-21,1992,car,rented,color=white^fuel_efficient
+Dodge,Viper,6MY-SDT7A-3EKJ-6543-21,1993,car,available,color=red$performance:high
+Jeep,Wrangler,7KY-UDT7A-3EKJ-6543-21,2005,car,available,color=green!off-road:capable
+Ford,F-150,8LZ-XDT7A-EKJ654321,2010,truck,available,color:black,payload:high
+Tesla,Model S,TM#S-12345,2012,car,rented,color:silver,electric:yes
+Nissan,Leaf,LEAF#2015,2015,car,available,color:blue,electric:yes
+Harley-Davidson,Street Glide,HDS-SG-2018-001,2018,bike,available,color=black,engine_displacement:1745
+Ducati,Panigale V4,DPV4#2020,2020,bike,rented,color=red,horsepower:214
+Toyota,Tacoma,TACOMA-22XX,2022,truck,available,color:gray,bed_size:short
+Rivian,R1T,R1T-VIN-12345,2023,truck,available,color:green,electric:yes
