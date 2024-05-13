@@ -1,6 +1,6 @@
 CREATE TABLE addresses
 (
-    id              SERIAL PRIMARY KEY,
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     type            VARCHAR(50) NOT NULL,
     in_care_of_name VARCHAR(255),
     street          VARCHAR(255),
