@@ -5,6 +5,15 @@ import (
 	"github.com/asaphin/all-databases-go/internal/domain"
 )
 
+type EntitiesLedger interface {
+	Add(*Entity) error
+	Remove(*Entity) error
+	GetByResource(resource string) ([]*Entity, error)
+	GetAll() ([]*Entity, error)
+	ClearByResource(resource string) error
+	ClearAll() error
+}
+
 type FilesRepository interface {
 	Put(ctx context.Context, file *domain.File) error
 	List(ctx context.Context) ([]*domain.FileListItem, error)
