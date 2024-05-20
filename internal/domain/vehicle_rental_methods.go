@@ -53,3 +53,7 @@ func (a Address) String() string {
 
 	return builder.String()
 }
+
+func (v Vehicle) String() string {
+	return fmt.Sprintf("%s: %s", v.Type, v.Manufacturer)
+}

@@ -77,6 +77,10 @@ func UnmarshalJSONFromFile(path string, v any) error {
 	return nil
 }
 
+func MustUnmarshalJSONFromFile(path string, v any) {
+	must(UnmarshalJSONFromFile(path, v))
+}
+
 func UnmarshalCSVFromFile[T any](path string, divider rune, rowType T) ([]T, error) {
 	var decodedContent []T
 

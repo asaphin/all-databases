@@ -53,9 +53,12 @@ type Station struct {
 type VehicleType string
 
 const (
-	Car   VehicleType = "car"
-	Truck VehicleType = "truck"
-	Bike  VehicleType = "bike"
+	Car        VehicleType = "car"
+	Truck      VehicleType = "truck"
+	Bike       VehicleType = "bike"
+	Motorcycle VehicleType = "motorcycle"
+	Boat       VehicleType = "boat"
+	Plane      VehicleType = "plane"
 )
 
 type VehicleStatus string

@@ -83,6 +83,25 @@ func (vr *VehicleRentalDataGenerator) Address() domain.Address {
 	}
 }
 
+func (vr *VehicleRentalDataGenerator) Vehicle() domain.Vehicle {
+	probabilityValue := rand.Float64()
+
+	var vehicleType domain.VehicleType
+
+	for _, typeProbability := range vehicleTypeCumulativeDistribution {
+		vehicleType = typeProbability.Type
+
+		if typeProbability.Probability > probabilityValue {
+			break
+		}
+	}
+
+	return domain.Vehicle{
+		Manufacturer: randomElement(manufacturers[vehicleType]),
+		Type:         vehicleType,
+	}
+}
+
 func randomElement[T any](s []T) T {
 	return s[rand.Intn(len(s))]
 }

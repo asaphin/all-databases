@@ -7,6 +7,6 @@ import (
 
 func main() {
 	for i := 0; i < 10; i++ {
-		fmt.Println(datagenerator.New().VR().Address().String())
+		fmt.Println(datagenerator.New().VR().Vehicle().String())
 	}
 }

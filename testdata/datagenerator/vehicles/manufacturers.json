@@ -1,0 +1,56 @@
+{
+  "car": [
+    "Toyota",
+    "Honda",
+    "Ford",
+    "Chevrolet",
+    "Buick",
+    "GMC",
+    "Chrysler",
+    "Jeep",
+    "Dodge",
+    "Ram",
+    "Hyundai",
+    "Nissan",
+    "Volkswagen",
+    "Tesla"
+  ],
+  "truck": [
+    "Ford",
+    "Chevrolet",
+    "GMC",
+    "Ram",
+    "Toyota",
+    "Nissan",
+    "Rivian"
+  ],
+  "bike": [
+    "Specialized",
+    "Trek",
+    "Giant",
+    "Schwinn",
+    "Cannondale"
+  ],
+  "motorcycle": [
+    "Harley-Davidson",
+    "Honda",
+    "Yamaha",
+    "Kawasaki",
+    "BMW",
+    "Ducati"
+  ],
+  "boat": [
+    "Sea Ray",
+    "MasterCraft",
+    "Boston Whaler",
+    "Beneteau",
+    "Bayliner"
+  ],
+  "plane": [
+    "Boeing",
+    "Airbus",
+    "Cessna",
+    "Dassault",
+    "Embraer"
+  ]
+}
