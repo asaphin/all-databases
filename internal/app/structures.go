@@ -33,3 +33,8 @@ func NewEntity(resource string, keyComponents ...interface{}) *Entity {
 		Key:      keyComponents,
 	}
 }
+
+type Action struct {
+	name     string
+	function func() error
+}

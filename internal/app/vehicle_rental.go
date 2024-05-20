@@ -4,10 +4,13 @@ import (
 	"context"
 	"github.com/asaphin/all-databases-go/internal/domain"
 	"github.com/asaphin/all-databases-go/internal/utils"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
 const brandsResource = "brands"
+
+const brandsFile = "./testdata/vehicle_rental/brands.csv"
 
 type VehicleRentalScenarioService struct {
 	brandsRepository BrandsRepository
@@ -22,42 +25,82 @@ func NewVehicleRentalScenarioService(brandsRepository BrandsRepository, ledger E
 }
 
 func (s *VehicleRentalScenarioService) Run() {
-	s.createBrand()
-	s.cleanupBrands()
+	actions := []Action{
+		{name: "create brands", function: s.createBrands},
+		{name: "get brands", function: s.getBrands},
+		{name: "get random brand", function: s.getRandomBrand},
+	}
+
+	for _, action := range actions {
+		err := action.function()
+		if err != nil {
+			log.WithError(err).Errorf("%s action failed", action.name)
+			break
+		}
+	}
+
+	cleanupActions := []Action{
+		{name: "cleanup brands", function: s.cleanupBrands},
+	}
+
+	for _, action := range cleanupActions {
+		err := action.function()
+		if err != nil {
+			log.WithError(err).Errorf("%s action failed", action.name)
+		}
+	}
 }
 
-func (s *VehicleRentalScenarioService) createBrand() {
-	newBrand := &domain.Brand{
-		BrandListItem: domain.BrandListItem{
-			Name: "Vintage Voyage",
-		},
-		Slogan: "Experience the charm of a bygone era",
+func (s *VehicleRentalScenarioService) createBrands() error {
+	newBrands := utils.MustUnmarshalCSVFromFile(brandsFile, ';', domain.Brand{})
+
+	for _, newBrand := range newBrands {
+		id, err := s.brandsRepository.Create(context.Background(), &newBrand)
+		if err != nil {
+			return err
+		}
+
+		utils.LogAsWarningIfError(s.ledger.Add(NewEntity(brandsResource, id)))
 	}
 
-	id, err := s.brandsRepository.Create(context.Background(), newBrand)
+	log.Infof("created %d brands", len(newBrands))
+
+	return nil
+}
+
+func (s *VehicleRentalScenarioService) getBrands() error {
+	brands, err := s.brandsRepository.List(context.Background(), 0, 0)
 	if err != nil {
-		log.WithError(err).Error("unable to create brand")
-		return
+		return err
 	}
 
-	log.WithFields(log.Fields{"id": id, "brand": newBrand}).Info("new brand created")
+	log.Infof("retrieved %d brands", len(brands))
 
-	utils.LogAsWarningIfError(s.ledger.Add(NewEntity(brandsResource, id)))
+	return nil
+}
+
+func (s *VehicleRentalScenarioService) getRandomBrand() error {
+	entities, err := s.ledger.GetByResource(brandsResource)
+	if err != nil {
+		return errors.Wrapf(err, "unable to get created entities for resource %s", brandsResource)
+	}
+
+	id := utils.GetRandomElement(entities).Key.String(0)
 
 	brand, err := s.brandsRepository.GetByID(context.Background(), id)
 	if err != nil {
-		log.WithError(err).WithField("id", id).Error("unable to get brand")
-		return
+		return errors.Wrapf(err, "unable to get created brand %s", id)
 	}
 
-	log.WithFields(log.Fields{"id": id, "brand": brand}).Info("got a brand")
+	log.WithField("brand", brand).Info("got random brand")
+
+	return nil
 }
 
-func (s *VehicleRentalScenarioService) cleanupBrands() {
+func (s *VehicleRentalScenarioService) cleanupBrands() error {
 	entities, err := s.ledger.GetByResource(brandsResource)
 	if err != nil {
-		log.WithError(err).WithField("resource", brandsResource).Error("unable to get created entities")
-		return
+		return errors.Wrapf(err, "unable to get created entities for resource %s", brandsResource)
 	}
 
 	for i := range entities {
@@ -65,10 +108,11 @@ func (s *VehicleRentalScenarioService) cleanupBrands() {
 
 		err = s.brandsRepository.Delete(context.Background(), id)
 		if err != nil {
-			log.WithError(err).WithField("id", id).Error("unable to delete brand")
-			return
+			return errors.Wrapf(err, "unable to delete brand %s", id)
 		}
 	}
 
 	log.Info("brands cleared")
+
+	return nil
 }

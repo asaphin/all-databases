@@ -16,16 +16,6 @@ func NewAllDatabasesService() *AllDatabasesService {
 }
 
 func (a *AllDatabasesService) Run(_ context.Context) error {
-	//addressesRepository, err := postgres.NewSQLXAddressesRepository()
-	//if err != nil {
-	//	log.WithError(err).Error("unable to create addresses repository")
-	//	return err
-	//}
-	//
-	//addressesScenario := app.NewAddressesScenarioService(addressesRepository)
-	//
-	//addressesScenario.Run()
-
 	brandsRepository, err := postgres.NewSQLXBrandsRepository()
 	if err != nil {
 		log.WithError(err).Error("unable to create brands repository")
@@ -37,10 +27,6 @@ func (a *AllDatabasesService) Run(_ context.Context) error {
 	vehicleRentalScenario := app.NewVehicleRentalScenarioService(brandsRepository, entityLedger)
 
 	vehicleRentalScenario.Run()
-
-	//brandsScenario := app.NewBrandsScenarioService(brandsRepository)
-	//
-	//brandsScenario.Run()
 
 	return nil
 }

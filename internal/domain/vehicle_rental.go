@@ -33,8 +33,9 @@ type BrandListItem struct {
 }
 
 type Brand struct {
-	BrandListItem
-	Slogan string `json:"slogan" db:"slogan"`
+	ID     string `json:"id" db:"id"`
+	Name   string `json:"name" db:"name" csv:"name"`
+	Slogan string `json:"slogan" db:"slogan" csv:"slogan"`
 }
 
 type Station struct {

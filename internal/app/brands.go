@@ -28,9 +28,7 @@ func (s *BrandsScenarioService) Run() {
 	log.WithField("brands", brands).Info("got list of brands")
 
 	newBrand := &domain.Brand{
-		BrandListItem: domain.BrandListItem{
-			Name: "Vintage Voyage",
-		},
+		Name:   "Vintage Voyage",
 		Slogan: "Experience the charm of a bygone era",
 	}
 
