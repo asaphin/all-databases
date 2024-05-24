@@ -76,7 +76,7 @@ type Vehicle struct {
 	Year         int
 	Type         VehicleType
 	Status       VehicleStatus
-	Metadata     map[string]string
+	Metadata     map[string]any
 }
 
 type Customer struct {

@@ -2,18 +2,18 @@ package datagenerator
 
 import (
 	"github.com/asaphin/all-databases-go/internal/domain"
-	"github.com/jaswdr/faker"
+	"github.com/brianvoe/gofakeit/v7"
+	"github.com/brianvoe/gofakeit/v7/source"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"math/rand"
 	"reflect"
 	"strconv"
-	"strings"
 	"sync"
 )
 
 type DataGenerator struct {
-	faker.Faker
+	faker *gofakeit.Faker
 }
 
 var dataGeneratorInstance *DataGenerator
@@ -21,7 +21,7 @@ var dataGeneratorSync = sync.Once{}
 
 func New() *DataGenerator {
 	dataGeneratorSync.Do(func() {
-		dataGeneratorInstance = &DataGenerator{Faker: faker.New()}
+		dataGeneratorInstance = &DataGenerator{faker: gofakeit.NewFaker(source.NewCrypto(), true)}
 	})
 
 	return dataGeneratorInstance
@@ -41,25 +41,27 @@ func (vr *VehicleRentalDataGenerator) Address() domain.Address {
 	var inCareOfName string
 
 	if addressType == domain.CustomerAddress {
-		inCareOfName = optional(vr.dg.Person().Name(), 0.3)
+		inCareOfName = optional(vr.dg.faker.Person().FirstName+vr.dg.faker.Person().LastName, 0.3)
 	}
 
-	country := randomChioce("United States", vr.dg.Address().Country(), 0.4)
+	address := vr.dg.faker.Address()
+
+	country := randomChoice("United States", address.Country, 0.4)
 	var region string
 	if country == "United States" {
-		region = vr.dg.Address().State()
+		region = address.State
 	} else {
-		region = cases.Title(language.English, cases.Compact).String(vr.dg.Lorem().Word())
+		region = cases.Title(language.English, cases.Compact).String(vr.dg.faker.LoremIpsumWord())
 	}
 
 	additionalInfo := make(map[string]string)
 
 	optionalCall(func() {
-		additionalInfo["floor"] = strconv.Itoa(vr.dg.IntBetween(0, 10))
+		additionalInfo["floor"] = strconv.Itoa(vr.dg.faker.IntRange(0, 10))
 	}, 0.3)
 
 	optionalCall(func() {
-		additionalInfo["block"] = strconv.Itoa(vr.dg.IntBetween(0, 5))
+		additionalInfo["block"] = strconv.Itoa(vr.dg.faker.IntRange(0, 5))
 	}, 0.3)
 
 	if len(additionalInfo) == 0 {
@@ -70,16 +72,16 @@ func (vr *VehicleRentalDataGenerator) Address() domain.Address {
 		ID:             "",
 		Type:           addressType,
 		InCareOfName:   inCareOfName,
-		Street:         vr.dg.Address().StreetName(),
-		StreetNumber:   strings.TrimPrefix(vr.dg.Address().BuildingNumber(), "%"),
-		Apartment:      optional(strconv.Itoa(vr.dg.IntBetween(1, 100)), 0.5),
-		Locality:       vr.dg.Address().City(),
+		Street:         address.Street,
+		StreetNumber:   strconv.Itoa(vr.dg.faker.IntRange(1, 10000)),
+		Apartment:      strconv.Itoa(vr.dg.faker.IntRange(1, 1000)),
+		Locality:       address.City,
 		Region:         region,
-		PostalCode:     vr.dg.Address().PostCode(),
+		PostalCode:     address.Zip,
 		Country:        country,
 		AdditionalInfo: additionalInfo,
-		Latitude:       vr.dg.Float64(16, -90, 90),
-		Longitude:      vr.dg.Float64(16, -180, 180),
+		Latitude:       address.Latitude,
+		Longitude:      address.Longitude,
 	}
 }
 
@@ -97,8 +99,13 @@ func (vr *VehicleRentalDataGenerator) Vehicle() domain.Vehicle {
 	}
 
 	return domain.Vehicle{
-		Manufacturer: randomElement(manufacturers[vehicleType]),
+		Manufacturer: vr.dg.faker.RandomString(manufacturers[vehicleType]),
 		Type:         vehicleType,
+		Model:        vr.dg.faker.RandomString(vehicleModelNames) + " " + vr.dg.faker.Regex(`^[A-Z1-9]{2,3}$`),
+		SerialNumber: vr.dg.faker.Regex(vr.dg.faker.RandomString(serialNumberRegexes)),
+		Year:         vr.dg.faker.IntRange(2004, 2024),
+		Status:       domain.Available,
+		Metadata:     vr.dg.faker.Map(),
 	}
 }
 
@@ -106,7 +113,7 @@ func randomElement[T any](s []T) T {
 	return s[rand.Intn(len(s))]
 }
 
-func randomChioce[T any](e1, e2 T, firstElementProbability float64) T {
+func randomChoice[T any](e1, e2 T, firstElementProbability float64) T {
 	if rand.Float64() < firstElementProbability {
 		return e1
 	}

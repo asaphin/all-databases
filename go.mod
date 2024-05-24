@@ -4,9 +4,9 @@ go 1.22.2
 
 require (
 	github.com/asaphin/runner v0.0.2
+	github.com/brianvoe/gofakeit/v7 v7.0.3
 	github.com/golang-migrate/migrate/v4 v4.17.1
 	github.com/google/uuid v1.6.0
-	github.com/jaswdr/faker v1.19.1
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/jszwec/csvutil v1.10.0
 	github.com/lib/pq v1.10.9

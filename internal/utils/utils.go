@@ -10,6 +10,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"reflect"
 	"runtime"
 )
 
@@ -79,6 +80,14 @@ func UnmarshalJSONFromFile(path string, v any) error {
 
 func MustUnmarshalJSONFromFile(path string, v any) {
 	must(UnmarshalJSONFromFile(path, v))
+}
+
+func MustMustUnmarshalJSONFromFileAsType[T any](path string, returnType T) T {
+	t := reflect.TypeOf(returnType)
+	newValue := reflect.New(t).Interface()
+	MustUnmarshalJSONFromFile(path, newValue)
+
+	return reflect.ValueOf(newValue).Elem().Interface().(T)
 }
 
 func UnmarshalCSVFromFile[T any](path string, divider rune, rowType T) ([]T, error) {
